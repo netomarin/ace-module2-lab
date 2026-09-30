@@ -195,7 +195,7 @@ jobs:
         run: |
           set -uo pipefail
           echo "Scanning '$SCAN_PATH' — files: $SCAN_FILES (in-scope source is uploaded to Google's CodeMender service)..."
-          cm find "$SCAN_PATH" -y 2>&1 | tee "$RUNNER_TEMP/cm-find.cm.log"
+          cm find "$SCAN_PATH" -y --model gemini-3.6-flash 2>&1 | tee "$RUNNER_TEMP/cm-find.cm.log"
 
       - name: Export Security Report (cm report -f json)
         if: ${{ always() && steps.scan.conclusion != 'skipped' }}
@@ -240,7 +240,7 @@ jobs:
             # --bypass-warning: cm 0.2.0's responsibility warning must be
             # acknowledged interactively once per machine; CI runners are
             # fresh every run, so the session dies before fixing without it.
-            ( cd "$SCAN_PATH" && cm fix "$FID" -y --bypass-warning ) 2>&1 \
+            ( cd "$SCAN_PATH" && cm fix "$FID" -y --bypass-warning --model gemini-3.6-flash ) 2>&1 \
               | tee "$RUNNER_TEMP/fix-$FID.cm.log" || true
             # Surface a path-resolution failure on its own — otherwise it is
             # indistinguishable from success in the "no clean diff" branch below.
